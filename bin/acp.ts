@@ -112,9 +112,11 @@ function buildHelp(): string {
     "",
     cmd("job create <wallet> <offering>", "Start a job with an agent"),
     flag("--requirements '<json>'", "Service requirements (JSON)"),
+    flag("--isAutomated <true|false>", "Control payment flow (default: true)"),
     cmd("job status <job-id>", "Check job status"),
     cmd("job active [page] [pageSize]", "List active jobs"),
     cmd("job completed [page] [pageSize]", "List completed jobs"),
+    cmd("job negotiate <job-id>", "Process negotiation for a job"),
     cmd("bounty create [query]", "Create a new bounty (interactive or flags)"),
     flag("--title <text>", "Bounty title"),
     flag("--description <text>", "Bounty description"),
@@ -268,6 +270,7 @@ function buildCommandHelp(command: string): string | undefined {
         "",
         cmd("create <wallet> <offering>", "Start a job with an agent"),
         flag("--requirements '<json>'", "Service requirements (JSON)"),
+        flag("--isAutomated <true|false>", "Control payment flow (default: true — automatic)"),
         `    ${dim(
           'Example: acp job create 0x1234 "Execute Trade" --requirements \'{"pair":"ETH/USDC"}\''
         )}`,
@@ -278,6 +281,10 @@ function buildCommandHelp(command: string): string | undefined {
         cmd("active [page] [pageSize]", "List active jobs"),
         cmd("completed [page] [pageSize]", "List completed jobs"),
         `    ${dim("Pagination: positional args or --page N --pageSize N")}`,
+        "",
+        cmd("negotiate <job-id>", "Accept or reject job negotiation"),
+        flag("--accept <true|false>", "Whether to accept the negotiation"),
+        flag("--content '<text>'", "Optional message or memo content"),
         "",
       ].join("\n"),
 
@@ -598,6 +605,11 @@ async function main(): Promise<void> {
         const offering = rest[1];
         let remaining = rest.slice(2);
         const reqJson = getFlagValue(remaining, "--requirements");
+        remaining = removeFlagWithValue(remaining, "--requirements");
+
+        const isAutomatedStr = getFlagValue(remaining, "--isAutomated");
+        remaining = removeFlagWithValue(remaining, "--isAutomated");
+
         let requirements: Record<string, unknown> = {};
         if (reqJson) {
           try {
@@ -607,7 +619,21 @@ async function main(): Promise<void> {
             process.exit(1);
           }
         }
-        return job.create(walletAddr, offering, requirements);
+
+        let isAutomated = true;
+        if (typeof isAutomatedStr === "string") {
+          const lowered = isAutomatedStr.toLowerCase();
+          if (["true", "1"].includes(lowered)) {
+            isAutomated = true;
+          } else if (["false", "0"].includes(lowered)) {
+            isAutomated = false;
+          } else {
+            console.error("Error: --isAutomated must be true or false");
+            process.exit(1);
+          }
+        }
+
+        return job.create(walletAddr, offering, requirements, isAutomated);
       }
       if (subcommand === "status") {
         return job.status(rest[0]);
@@ -629,6 +655,26 @@ async function main(): Promise<void> {
         };
         if (subcommand === "active") return job.active(opts);
         return job.completed(opts);
+      }
+      if (subcommand === "negotiate") {
+        const jobId = rest[0];
+        const acceptStr = getFlagValue(rest, "--accept");
+        if (!acceptStr) {
+          console.error("Error: --accept <true|false> is required");
+          process.exit(1);
+        }
+        const lowered = acceptStr.toLowerCase();
+        let accept: boolean;
+        if (["true", "1"].includes(lowered)) {
+          accept = true;
+        } else if (["false", "0"].includes(lowered)) {
+          accept = false;
+        } else {
+          console.error("Error: --accept must be true or false");
+          process.exit(1);
+        }
+        const content = getFlagValue(rest, "--content");
+        return job.negotiate(jobId, accept, content);
       }
       console.log(buildCommandHelp("job"));
       return;
