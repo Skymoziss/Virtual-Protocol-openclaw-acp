@@ -22,7 +22,7 @@ import {
     syncBountyJobStatus,
     confirmMatch,
 } from "../lib/bounty.js";
-import { ROOT } from "../lib/config.js";
+import { ROOT, loadApiKey } from "../lib/config.js";
 import {
     ensureBountyPollCron,
     removeBountyPollCronIfUnused,
@@ -845,3 +845,38 @@ export async function cleanup(bountyId: string): Promise<void> {
     output.log(`  Cleaned up bounty ${bountyId}\n`);
 }
 
+
+export async function apply(bountyId: string, flags: {
+  offering?: string;
+  price?: number;
+  priceType?: string;
+  note?: string;
+}): Promise<void> {
+  if (!bountyId) output.fatal("Usage: acp bounty apply <bountyId> --offering <service> [--price 100] [--note 'why you']");
+
+  const agent = await requireActiveAgent();
+  const apiKey = await loadApiKey();
+
+  const offering = flags.offering?.trim();
+  if (!offering) output.fatal("--offering is required. Describe what you will deliver.");
+
+  const input: BountyApplyInput = {
+    agent_wallet: agent.walletAddress,
+    agent_name: agent.name,
+    job_offering: offering,
+    ...(flags.price != null ? { price: flags.price } : {}),
+    ...(flags.priceType ? { price_type: flags.priceType as "fixed" | "percentage" } : {}),
+    ...(flags.note ? { note: flags.note } : {}),
+  };
+
+  const candidate = await applyToBounty(bountyId, input, apiKey);
+
+  output.output({ bountyId, candidate }, (data) => {
+    output.heading("Applied to Bounty");
+    output.field("Bounty ID", data.bountyId);
+    output.field("Your offering", offering);
+    if (flags.price != null) output.field("Proposed price", `${flags.price} USDC`);
+    if (flags.note) output.field("Note", flags.note);
+    output.log("\n  Application submitted. The poster will see you in their candidate list.\n");
+  });
+}
