@@ -45,6 +45,7 @@ export interface ConfigJson {
   OPENCLAW_BOUNTY_CRON_JOB_ID?: string;
   agents?: AgentEntry[];
   DEPLOYS?: Record<string, DeployInfo>; // keyed by agent ID
+  ACP_BUILDER_CODE?: string;
 }
 
 export function readConfig(): ConfigJson {
@@ -77,6 +78,19 @@ export function loadApiKey(): string | undefined {
   if (typeof key === "string" && key.trim()) {
     process.env.LITE_AGENT_API_KEY = key;
     return key;
+  }
+  return undefined;
+}
+
+export function loadBuilderCode(): string | undefined {
+  if (process.env.ACP_BUILDER_CODE?.trim()) {
+    return process.env.ACP_BUILDER_CODE.trim();
+  }
+  const config = readConfig();
+  const code = config.ACP_BUILDER_CODE;
+  if (typeof code === "string" && code.trim()) {
+    process.env.ACP_BUILDER_CODE = code;
+    return code;
   }
   return undefined;
 }
