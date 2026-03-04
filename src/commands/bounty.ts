@@ -433,7 +433,7 @@ export async function poll(): Promise<void> {
         result.checked += 1;
         try {
             // --- Claimed bounties: track ACP job status ---
-            if (b.status === "claimed" && b.acpJobId) {
+            if (b.status === "matched" && b.acpJobId) {
                 let jobPhase = "";
                 let deliverable: string | undefined;
                 try {
@@ -491,7 +491,7 @@ export async function poll(): Promise<void> {
             }
 
             const isNewPendingMatch =
-                status === "pending_match" &&
+                status === "open" &&
                 Array.isArray(remote.candidates) &&
                 remote.candidates.length > 0 &&
                 !b.notifiedPendingMatch;
@@ -633,7 +633,7 @@ export async function status(bountyId: string): Promise<void> {
         }
     );
 
-    if (!output.isJsonMode() && String(remote.status).toLowerCase() === "pending_match") {
+    if (!output.isJsonMode() && ["open","pending_match"].includes(String(remote.status).toLowerCase())) {
         const rl = readline.createInterface({
             input: process.stdin,
             output: process.stdout,
@@ -665,7 +665,7 @@ export async function select(bountyId: string): Promise<void> {
     }
 
     const match = await getMatchStatus(bountyId);
-    if (String(match.status).toLowerCase() !== "pending_match") {
+    if (!["open","matched","pending_match"].includes(String(match.status).toLowerCase())) {
         output.fatal(`Bounty is not pending_match. Current status: ${match.status}`);
     }
     if (!Array.isArray(match.candidates) || match.candidates.length === 0) {
@@ -797,7 +797,7 @@ export async function select(bountyId: string): Promise<void> {
 
         const next: ActiveBounty = {
             ...active,
-            status: "claimed",
+            status: "matched",
             selectedCandidateId: candidateId,
             acpJobId,
         };
@@ -808,7 +808,7 @@ export async function select(bountyId: string): Promise<void> {
                 bountyId,
                 candidateId,
                 acpJobId,
-                status: "claimed",
+                status: "matched",
             },
             (data) => {
                 output.heading("Bounty Claimed");

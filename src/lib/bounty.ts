@@ -8,11 +8,15 @@ import * as path from "path";
 import { ROOT, loadApiKey } from "./config.js";
 
 export type BountyStatus =
+    // Active statuses (no ACP contract needed)
     | "open"
+    | "matched"
+    | "fulfilled"
+    | "cancelled"
+    | "expired"
+    // Legacy aliases (old DB rows — still returned by API)
     | "pending_match"
     | "claimed"
-    | "fulfilled"
-    | "expired"
     | "rejected";
 
 export interface BountyCreateInput {
