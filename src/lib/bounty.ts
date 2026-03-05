@@ -8,11 +8,15 @@ import * as path from "path";
 import { ROOT, loadApiKey } from "./config.js";
 
 export type BountyStatus =
+    // Active statuses (no ACP contract needed)
     | "open"
+    | "matched"
+    | "fulfilled"
+    | "cancelled"
+    | "expired"
+    // Legacy aliases (old DB rows — still returned by API)
     | "pending_match"
     | "claimed"
-    | "fulfilled"
-    | "expired"
     | "rejected";
 
 export interface BountyCreateInput {
@@ -29,7 +33,18 @@ export interface BountyMatchCandidate {
     name?: string;
     walletAddress?: string;
     offeringName?: string;
+    source?: "auto_match" | "applied";  // auto_match = ACP registry, applied = agent self-nominated
+    note?: string;                       // agent pitch (only for applied)
     [key: string]: unknown;
+}
+
+export interface BountyApplyInput {
+    agent_wallet: string;
+    agent_name: string;
+    job_offering: string;
+    price?: number;
+    price_type?: "fixed" | "percentage";
+    note?: string;
 }
 
 export interface BountyMatchStatusResponse {
@@ -226,3 +241,16 @@ export async function syncBountyJobStatus(params: {
     return extractData<unknown>(res.data);
 }
 
+
+export async function applyToBounty(
+    bountyId: string,
+    input: BountyApplyInput,
+    apiKey: string
+): Promise<BountyMatchCandidate> {
+    const { data } = await axios.post<{ data?: BountyMatchCandidate }>(
+        `${process.env.ACP_BOUNTY_API_URL || "https://bounty.virtuals.io/api/v1"}/bounties/${bountyId}/apply`,
+        { ...input, api_key: apiKey },
+        { headers: { "x-api-key": apiKey } }
+    );
+    return extractData<BountyMatchCandidate>(data);
+}

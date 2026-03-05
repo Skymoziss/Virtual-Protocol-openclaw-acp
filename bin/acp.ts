@@ -477,6 +477,18 @@ async function main(): Promise<void> {
       if (subcommand === "status") return bounty.status(rest[0]);
       if (subcommand === "select") return bounty.select(rest[0]);
       if (subcommand === "cleanup") return bounty.cleanup(rest[0]);
+      if (subcommand === "apply") {
+        const offering = getFlagValue(args, "--offering");
+        const priceRaw = getFlagValue(args, "--price");
+        const priceType = getFlagValue(args, "--price-type");
+        const note = getFlagValue(args, "--note");
+        return bounty.apply(rest[0], {
+          offering: offering || undefined,
+          price: priceRaw ? parseFloat(priceRaw) : undefined,
+          priceType: priceType || undefined,
+          note: note || undefined,
+        });
+      }
       console.log(buildCommandHelp("bounty"));
       return;
     }
