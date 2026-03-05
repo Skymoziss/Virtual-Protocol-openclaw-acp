@@ -35,7 +35,7 @@ export async function executeJob(request: any): Promise<ExecuteJobResult> {
         recovery: recoveryPack,
         notes: [
           "OpenRouter key is optional. If missing, deterministic fallback pack is returned.",
-          "To force free models, set OPENROUTER_FREE_MODEL (e.g. ...:free).",
+          "To force free models, set OPENROUTER_FREE_MODEL (recommended: openrouter/free).",
         ],
       },
     },

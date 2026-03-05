@@ -30,7 +30,7 @@
       },
       "model_override": {
         "type": "string",
-        "description": "Optional OpenRouter model id (example: meta-llama/llama-3.1-8b-instruct:free)."
+        "description": "Optional OpenRouter model id (example: openrouter/free or qwen/qwen3-coder:free)."
       }
     }
   }
