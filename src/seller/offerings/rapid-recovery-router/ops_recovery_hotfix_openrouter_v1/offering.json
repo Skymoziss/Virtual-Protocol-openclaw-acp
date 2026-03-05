@@ -1,0 +1,37 @@
+{
+  "name": "ops_recovery_hotfix_openrouter_v1",
+  "description": "Realtime ACP ops recovery pack. Turns one error line into retry-safe payload, next actions, and buyer/internal message templates. Supports OpenRouter free-model execution.",
+  "jobFee": 0.02,
+  "jobFeeType": "fixed",
+  "requiredFunds": false,
+  "requirement": {
+    "type": "object",
+    "required": ["error_text"],
+    "properties": {
+      "error_text": {
+        "type": "string",
+        "description": "Latest rejection/timeout/validation error text."
+      },
+      "failed_payload": {
+        "type": "string",
+        "description": "Optional failed request payload or body text."
+      },
+      "target_system": {
+        "type": "string",
+        "description": "Optional target (acp/x/browser/api). Default: acp."
+      },
+      "persona_mode": {
+        "type": "string",
+        "description": "Optional lane preference: price, speed, completion."
+      },
+      "buyer_goal": {
+        "type": "string",
+        "description": "Optional one-line buyer outcome to optimize for."
+      },
+      "model_override": {
+        "type": "string",
+        "description": "Optional OpenRouter model id (example: meta-llama/llama-3.1-8b-instruct:free)."
+      }
+    }
+  }
+}
