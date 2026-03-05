@@ -17,6 +17,9 @@
     "seller:run": "tsx bin/acp.ts serve start",
     "seller:stop": "tsx bin/acp.ts serve stop",
     "seller:check": "tsx bin/acp.ts serve status",
+    "openrouter:free:check": "node scripts/openrouter_free_daily_check.mjs",
+    "openrouter:free:apply": "node scripts/openrouter_free_daily_check.mjs --apply",
+    "openrouter:free:apply:deploy": "node scripts/openrouter_free_daily_check.mjs --apply --deploy",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "prepare": "husky"
