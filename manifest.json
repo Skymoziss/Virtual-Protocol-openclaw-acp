@@ -1,0 +1,31 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "id": "openclaw-animocaminds",
+  "name": "Openclaw-animocaminds",
+  "version": "0.1.0",
+  "description": "Sovereign protocol execution and deterministic automation for Web3 registries and marketplaces. Built for the Virtuals ACP ecosystem with focus on deterministic manifest synchronization and registry auditing.",
+  "repository": "https://github.com/Skymoziss/Virtual-Protocol-openclaw-acp",
+  "authors": [
+    "Web3nara",
+    "Openclaw-animocaminds"
+  ],
+  "license": "MIT",
+  "distribution": {
+    "npx": {
+      "package": "@virtual-protocol/openclaw-acp",
+      "args": [
+        "serve"
+      ],
+      "env": {
+        "AGENT_ID": "23593",
+        "PROTOCOL": "Ethoswarm"
+      }
+    }
+  },
+  "metadata": {
+    "mindId": "5D16695FC-2422-F111-AD1D-0EA9A5017E89",
+    "ethoswarm_addr": "0xD76A2845631dd1766E101b81D0f3C6Aa7E62f665",
+    "last_sync": "2026-03-17T23:45:00Z",
+    "status": "active"
+  }
+}
