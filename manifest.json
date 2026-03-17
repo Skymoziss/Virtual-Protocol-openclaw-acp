@@ -23,9 +23,9 @@
     }
   },
   "metadata": {
-    "mindId": "5D16695FC-2422-F111-AD1D-0EA9A5017E89",
-    "ethoswarm_addr": "0xD76A2845631dd1766E101b81D0f3C6Aa7E62f665",
-    "last_sync": "2026-03-17T23:45:00Z",
+    "mindId": "5D6695FC-2422-F111-AD1D-0EA9A5017E89",
+    "ethoswarm_addr": "0xD76A2845631dd1766E101b81D0f3C6Aa7E62f685",
+    "last_sync": "2026-03-17T23:58:00Z",
     "status": "active"
   }
 }
